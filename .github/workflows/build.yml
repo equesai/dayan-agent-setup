@@ -1,0 +1,108 @@
+# Builds DayanSetup.exe from this repository on GitHub's own Windows machines,
+# checks the Linux scripts, and for a version tag (v1.2.3) publishes a release:
+# signed through SignPath once the project is set up there (each signing request
+# waits for an approver), unsigned until then.
+name: build
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    outputs:
+      artifact-id: ${{ steps.upload.outputs.artifact-id }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+      - name: Build DayanSetup.exe
+        run: python windows/build.py --out dist/DayanSetup.exe
+      - name: Check it carries this source and this version
+        run: python windows/build.py --verify dist/DayanSetup.exe
+      - name: A tag must match the VERSION file
+        if: startsWith(github.ref, 'refs/tags/v')
+        shell: bash
+        run: test "v$(tr -d '[:space:]' < VERSION)" = "$GITHUB_REF_NAME"
+      - name: Keep the unsigned file
+        id: upload
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: DayanSetup-unsigned
+          path: dist/DayanSetup.exe
+          if-no-files-found: error
+
+  linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Check the Linux scripts
+        run: |
+          bash -n linux/setup.sh
+          bash -n linux/check.sh
+          shellcheck -S warning linux/setup.sh linux/check.sh
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [windows, linux]
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Sign through SignPath (waits for an approver)
+        if: vars.SIGNPATH_ORGANIZATION_ID != ''
+        uses: signpath/github-action-submit-signing-request@f6d04783b4569d051e0c80105fe66e82819d0092 # v3.0
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: dayan-agent-setup
+          signing-policy-slug: release-signing
+          github-artifact-id: ${{ needs.windows.outputs.artifact-id }}
+          wait-for-completion: true
+          wait-for-completion-timeout-in-seconds: 18000
+          output-artifact-directory: release
+      - name: Or the unsigned file, until SignPath is set up
+        if: vars.SIGNPATH_ORGANIZATION_ID == ''
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: DayanSetup-unsigned
+          path: release
+      - name: Publish the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SIGNED: ${{ vars.SIGNPATH_ORGANIZATION_ID != '' }}
+        run: |
+          cp linux/setup.sh linux/check.sh windows/check.ps1 release/
+          (cd release && sha256sum -- * > SHA256SUMS)
+          if [ "$SIGNED" = true ]; then signed="Signed through SignPath (certificate by SignPath Foundation)."
+          else signed="Not signed yet: Windows SmartScreen asks before it runs."; fi
+          notes="Dayan Agent Setup $GITHUB_REF_NAME, built by GitHub Actions from $GITHUB_SHA. $signed
+
+          You get the setup from Dayan's chat (Quick > Run Dayan Agent on my device), which gives it the one-time code for your choices; these files are the same program, for checking and building.
+
+          [Code signing policy](https://github.com/$GITHUB_REPOSITORY#code-signing-policy) · [Privacy](https://github.com/$GITHUB_REPOSITORY/blob/main/PRIVACY.md)"
+          # Run again for the same tag (once SignPath is set up), the signed file replaces the unsigned one.
+          if gh release view "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload "$GITHUB_REF_NAME" release/* --repo "$GITHUB_REPOSITORY" --clobber
+            gh release edit "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --notes "$notes"
+          else
+            gh release create "$GITHUB_REF_NAME" release/* --repo "$GITHUB_REPOSITORY" \
+              --title "Dayan Agent Setup $GITHUB_REF_NAME" --notes "$notes"
+          fi
