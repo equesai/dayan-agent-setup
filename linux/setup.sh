@@ -251,13 +251,13 @@ download() { # download <url> <file> <sha256|empty>, with a progress bar that is
   return 0
 }
 
-tools_lookup() { # tools_lookup [quiet]: which arduino-cli file fits this computer, with its SHA-256
+tools_lookup() { # which arduino-cli file fits this computer, with its SHA-256
   [ -n "$TOOLS" ] && [ -s "$TOOLS" ] && return 0
   TOOLS="$TMP_DIR/tools.json"
   local status; status=$(http GET "$DAYAN_API/api/device-setup/tools?os=linux&arch=$ARCH" "$TOOLS")
   [ "$status" = "200" ] && return 0
   TOOLS=""; log "tools lookup failed: HTTP $status"
-  [ -n "${1:-}" ] || fail "Dayan couldn't tell which files fit this computer (HTTP $status)."
+  fail "Dayan couldn't tell which files fit this computer (HTTP $status)."
   return 1
 }
 
