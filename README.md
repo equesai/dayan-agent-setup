@@ -11,7 +11,7 @@ right on your own machine.
 **macOS and Linux:** open Terminal and run
 
 ```
-curl -fsSL https://github.com/equesai/dayan-agent-setup/releases/latest/download/setup.sh | bash
+(curl -fsSL https://github.com/equesai/dayan-agent-setup/releases/latest/download/setup.sh || wget -qO- https://github.com/equesai/dayan-agent-setup/releases/latest/download/setup.sh) | bash
 ```
 
 ## Your key
