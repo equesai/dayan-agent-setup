@@ -8,8 +8,11 @@ right on your own machine.
 
 **Windows 10 / 11:** [DayanSetup.exe](https://github.com/equesai/dayan-agent-setup/releases/latest/download/DayanSetup.exe)
 
-**macOS and Linux:** coming here with the next update. Until then, sign in to
-Dayan and use **Quick › Run Dayan Agent on my device**.
+**macOS and Linux:** open Terminal and run
+
+```
+curl -fsSL https://github.com/equesai/dayan-agent-setup/releases/latest/download/setup.sh | bash
+```
 
 ## Your key
 
