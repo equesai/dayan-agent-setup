@@ -2,7 +2,9 @@
 
 The installer that connects an AI agent on your computer to
 [Dayan](https://dayan.equesai.tech), so Dayan can study and build with you
-right on your own machine.
+right on your own machine. Dayan Agent works in **Claude Code** (recommended)
+or **Codex**; OpenCode is installed in the background for Dayan's own free
+models, with no desktop app or Start menu entry of its own.
 
 ## Download
 
