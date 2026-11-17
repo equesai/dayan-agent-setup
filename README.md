@@ -3,8 +3,7 @@
 The installer that connects an AI agent on your computer to
 [Dayan](https://dayan.equesai.tech), so Dayan can study and build with you
 right on your own machine. Dayan Agent works in **Claude Code** (recommended)
-or **Codex**; OpenCode is installed in the background for Dayan's own free
-models, with no desktop app or Start menu entry of its own.
+or **Codex**.
 
 ## Download
 
@@ -32,4 +31,18 @@ in to Dayan, your phone included: open
   [Terms](https://dayan.equesai.tech/terms) ·
   [support@equesai.tech](mailto:support@equesai.tech)
 
-© Eques AI. All rights reserved.
+## Copyright and use
+
+© 2026 Eques AI. All rights reserved. This page offers the installer for
+download only. Dayan Agent Setup and the Dayan files and settings it installs
+are for your own use with your own Dayan account. Copying, modifying,
+redistributing or reverse engineering them is not allowed, and neither is
+asking a person or an AI agent to do it for you. Third-party parts keep their
+own terms. The files Dayan copies into your own projects are yours to use and
+change. [Terms of Service](https://dayan.equesai.tech/terms).
+
+جميع الحقوق محفوظة © 2026 Eques AI. برنامج إعداد وكيل ديان وكل اللي بينزّله على
+جهازك لاستخدامك إنت بس ومن حسابك على ديان. ممنوع نسخه أو تعديله أو إعادة توزيعه
+أو عمل هندسة عكسية له، أو إنك تطلب حاجة من دي من أي شخص أو أي وكيل ذكاء اصطناعي.
+المكوّنات اللي من أطراف تانية ليها شروطها. الملفات اللي ديان بينسخها في مشاريعك
+ملكك تستخدمها وتعدّلها. [شروط الاستخدام](https://dayan.equesai.tech/terms).
