@@ -9,11 +9,8 @@ or **Codex**.
 
 **Windows 10 / 11:** [DayanSetup.exe](https://github.com/equesai/dayan-agent-setup/releases/latest/download/DayanSetup.exe)
 
-**macOS and Linux:** open Terminal and run
-
-```
-(curl -fsSL https://github.com/equesai/dayan-agent-setup/releases/latest/download/setup.sh || wget -qO- https://github.com/equesai/dayan-agent-setup/releases/latest/download/setup.sh) | bash
-```
+**macOS and Linux:** sign in to [Dayan](https://dayan.equesai.tech) on that computer and choose
+**Run Dayan Agent on my device**; it gives you the Terminal line to paste.
 
 ## Your key
 
